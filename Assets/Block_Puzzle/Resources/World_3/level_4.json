@@ -1,0 +1,13 @@
+{
+"bricks": "    
+    x x - - - - - - x x.
+    x x x - - - - x x x.
+    x x x x - - x x x x.
+    - x - x x x x - x -.
+    - x - x x x x - x -.
+    x x x x - - x x x x.
+    x x x - - - - x x x.
+    x x - - - - - - x x",
+"time": 120,
+"difficulty" : 5
+}
