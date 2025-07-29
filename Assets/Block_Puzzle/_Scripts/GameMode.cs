@@ -3,8 +3,6 @@ using System.Collections;
 using UnityEngine.UI;
 using Superpow;
 public class GameMode : MonoBehaviour {
-    public GameObject classicSelected, challengeSelected;
-    public CanvasGroup difficulty;
     private int selectedIndex = 0, diff = 0;
     public Sprite[] difficulties;
     public Image difficultyImage;
@@ -14,7 +12,6 @@ public class GameMode : MonoBehaviour {
         diff = Utils.GetDifficulty();
         int mode = Utils.GetGameMode();
         UpdateModes(mode);
-        UpdateDifficultySprite();
     }
 
     public void OnSelectMode(int index)
@@ -26,38 +23,29 @@ public class GameMode : MonoBehaviour {
     private void UpdateModes(int index)
     {
         selectedIndex = index;
-        classicSelected.SetActive(index == 0);
-        challengeSelected.SetActive(index == 1);
-        difficulty.alpha = index == 0 ? 1 : 0.5f;
         Utils.SetGameMode(index);
     }
 
-    public void OnNextClick()
-    {
-        if (selectedIndex == 0 && diff < difficulties.Length)
-        {
-            Sound.instance.PlayButton();
-            diff++;
-            Utils.SetDifficulty(diff);
-            UpdateDifficultySprite();
-        }
-    }
-
-    private void UpdateDifficultySprite()
-    {
-        difficultyImage.sprite = difficulties[diff - 1];
-    }
-
-    public void OnPrevClick()
-    {
-        if (selectedIndex == 0 && diff > 1)
-        {
-            Sound.instance.PlayButton();
-            diff--;
-            Utils.SetDifficulty(diff);
-            UpdateDifficultySprite();
-        }
-    }
+    // public void OnNextClick()
+    // {
+    //     if (selectedIndex == 0 && diff < difficulties.Length)
+    //     {
+    //         Sound.instance.PlayButton();
+    //         diff++;
+    //         Utils.SetDifficulty(diff);
+    //     }
+    // }
+    //
+    //
+    // public void OnPrevClick()
+    // {
+    //     if (selectedIndex == 0 && diff > 1)
+    //     {
+    //         Sound.instance.PlayButton();
+    //         diff--;
+    //         Utils.SetDifficulty(diff);
+    //     }
+    // }
 
     public static bool IsClassicMode()
     {

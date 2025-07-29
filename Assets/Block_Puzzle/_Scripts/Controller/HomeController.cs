@@ -1,14 +1,28 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityEngine.UI;
+using UomaWeb;
 
 public class HomeController : BaseController {
 
     public static HomeController instance;
+
+    public GameObject ControlPanel = null;
+    
     protected override void Awake()
     {
         instance = this;
         base.Awake();
+        this.ControlPanel.SetActive(false);
+        
+        
+        StartCoroutine(UomaController.Instance.GetVirtualCurrency((int currency) =>
+        {
+            StartCoroutine(UomaController.Instance.GetCompleteLevel((int result) =>
+            {
+                this.ControlPanel.SetActive(true);
+            }));
+        }));
     }
 
     protected override void Start()
@@ -19,14 +33,7 @@ public class HomeController : BaseController {
     public void OnPlayClick()
     {
         Sound.instance.PlayButton();
-        int mode = Superpow.Utils.GetGameMode();
-        CUtils.LoadScene(mode == 0 ? 2 : 1);
-    }
-
-    public void OnFacebookClick()
-    {
-        Sound.instance.PlayButton();
-        CUtils.LikeFacebookPage(ConfigController.Config.facebookPageID);
+        CUtils.LoadScene(2);
     }
 
     public void OnRemoveAdsClick()

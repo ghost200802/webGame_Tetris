@@ -205,7 +205,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: SCORE
+  m_Text: Coin
 --- !u!222 &25590095
 CanvasRenderer:
   m_ObjectHideFlags: 0

@@ -11,7 +11,7 @@ public class CurrencyController
 
     public static int GetBalance()
     {
-        return CPlayerPrefs.GetInt(PrefKeys.CURRENCY, DEFAULT_CURRENCY);
+        return 0;
     }
 
     public static void SetBalance(int value)

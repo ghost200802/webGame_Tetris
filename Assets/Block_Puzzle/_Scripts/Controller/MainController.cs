@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine.UI;
 using SimpleJSON;
 using System.Text.RegularExpressions;
+using UomaWeb;
 
 public class MainController : BaseController {
 
@@ -38,7 +39,7 @@ public class MainController : BaseController {
     protected override void Start()
     {
         base.Start();
-        gameMode = Superpow.Utils.GetGameMode();
+        gameMode = GameMode.CHALLENGE_MODE;//Superpow.Utils.GetGameMode();
         goalRegion.SetActive(gameMode == GameMode.CLASSIC_MODE);
         timerRegion.SetActive(gameMode == GameMode.CHALLENGE_MODE);
         if (gameMode == GameMode.CLASSIC_MODE)
@@ -49,8 +50,13 @@ public class MainController : BaseController {
         }
         else
         {
-            currWorld = LevelController.GetCurrentWorld();
-            currLevel = LevelController.GetCurrentLevel(currWorld);
+            int targetLevel = UomaDataManager.CurrLevel;
+            
+            // currWorld = LevelController.GetCurrentWorld();
+            // currLevel = LevelController.GetCurrentLevel(currWorld);
+            currWorld = (targetLevel-1) / 15 + 1;
+            currLevel = (targetLevel-1) % 15 + 1;
+            
             JSONNode node = Superpow.Utils.LoadLevelJson(currWorld, currLevel);
             string[] rows = node["bricks"].Value.Trim().Split('.');
             totalTime = node["time"].AsInt;
@@ -71,6 +77,7 @@ public class MainController : BaseController {
 
     public void FixedUpdate()
     {
+        this.scoreText.text = UomaDataManager.GetVirtualCurrency().ToString();
         if (gameState == GAMESTATE.PLAYING)
         {
             passTime += Time.deltaTime;
@@ -113,8 +120,8 @@ public class MainController : BaseController {
         }
         if(gameState == GAMESTATE.PLAYING)
         {
-            int totalCount = ConfigController.Config.rubyCostToContinue.Length;
-            int cost = ConfigController.Config.rubyCostToContinue[continueCount];
+            int totalCount = 10;
+            int cost = 100;
             if (CurrencyController.GetBalance() >= cost && continueCount < totalCount)
             {
                 System.Action onYes = (System.Action)(() =>
@@ -313,7 +320,7 @@ public class MainController : BaseController {
     {
         gameState = GAMESTATE.PAUSED;
         Sound.instance.PlayButton();
-        CUtils.ShowBannerAd();
+        //CUtils.ShowBannerAd();
         UpdatePanels();
     }
 
@@ -391,13 +398,7 @@ public class MainController : BaseController {
         Debug.Log("You need to implement this function by yourself or simply disable it");
 #endif
     }
-
-    public void OnFacebookClick()
-    {
-        Sound.instance.PlayButton();
-        CUtils.LikeFacebookPage(ConfigController.Config.facebookPageID);
-    }
-
+    
     public void OnReplayClick()
     {
         CUtils.CloseBannerAd();
@@ -408,7 +409,7 @@ public class MainController : BaseController {
     public void UpdatePanels()
     {
         pauseBtn.SetActive(gameState == GAMESTATE.PLAYING);
-        menuBtn.SetActive(gameState != GAMESTATE.PLAYING);
+        //menuBtn.SetActive(gameState != GAMESTATE.PLAYING);
 
         pausePanel.SetActive(gameState == GAMESTATE.PAUSED);
         endGamePanel.gameObject.SetActive(gameState == GAMESTATE.ENDGAME);
@@ -529,7 +530,7 @@ public class MainController : BaseController {
     public void AddScoreClassic(int newScore)
     {
         totalScore += newScore;
-        scoreText.text = totalScore.ToString();
+        // scoreText.text = totalScore.ToString();
         goal += newScore;
         if (goal >= levelGoal)
         {
@@ -545,7 +546,7 @@ public class MainController : BaseController {
     public void AddScoreChallenge(int newScore)
     {
         totalScore += newScore;
-        scoreText.text = totalScore.ToString();
+        // scoreText.text = totalScore.ToString();
     }
 
     public void RemoveBrick(Brick brick)
@@ -648,10 +649,35 @@ public class MainController : BaseController {
 
     private void ShowEndGame(bool isClassic, bool complete = false)
     {
+        if (complete)
+        {
+            var numStar = continueCount switch
+            {
+                0 => 3,
+                1 => 2,
+                _ => 1
+            };
+            StartCoroutine(UomaController.Instance.CompleteLevel(UomaDataManager.CurrLevel, numStar, (result) =>
+            {
+                if (result.successCode == 0)
+                {
+                    this.ShowEndGameInternal(isClassic, complete);
+                }
+            }));
+        }
+        else
+        {
+            this.ShowEndGameInternal(isClassic, complete);
+        }
+        
+    }
+
+    private void ShowEndGameInternal(bool isClassic, bool complete)
+    {
         gameState = GAMESTATE.ENDGAME;
         Sound.instance.Play(Sound.Others.EndGame);
         CUtils.ShowInterstitialAd();
-        CUtils.ShowBannerAd();
+        //CUtils.ShowBannerAd();
         UpdatePanels();
         endGamePanel.UpdateInfo(currDiff, totalScore, clearedLine, isClassic ? (int)passTime : (int)remainTime, isClassic, complete, continueCount);
     }
