@@ -14,8 +14,11 @@ public class HomeController : BaseController {
         instance = this;
         base.Awake();
         this.ControlPanel.SetActive(false);
-        
-        
+    }
+
+    protected override void Start()
+    {
+        base.Start();
         StartCoroutine(UomaController.Instance.GetVirtualCurrency((int currency) =>
         {
             StartCoroutine(UomaController.Instance.GetCompleteLevel((int result) =>
@@ -23,11 +26,6 @@ public class HomeController : BaseController {
                 this.ControlPanel.SetActive(true);
             }));
         }));
-    }
-
-    protected override void Start()
-    {
-        base.Start();
     }
 
     public void OnPlayClick()
